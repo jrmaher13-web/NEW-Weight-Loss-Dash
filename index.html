@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weight Loss Dashboard</title>
+<style>
+:root{
+  --bg:#f4f1ea; --panel:#fffdf8; --panel2:#f8f5ef; --text:#171717; --muted:#716d65;
+  --line:#ded8ce; --accent:#1f6a4f; --accent-soft:#e6f2ec; --warn:#a96918; --warn-soft:#fff3dc;
+  --bad:#a84040; --bad-soft:#fae8e8; --shadow:0 10px 28px rgba(45,39,30,.07); --radius:18px;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:30px 0 60px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}h1{font-size:28px;line-height:1.1;margin:0 0 6px}.sub{color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 13px;border-radius:11px;cursor:pointer}.btn:hover{filter:brightness(.98)}.btn.primary{background:var(--text);border-color:var(--text);color:white}.btn.danger{color:var(--bad)}
+.grid{display:grid;gap:14px}.hero{grid-template-columns:1.35fr .85fr .8fr}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.kicker{text-transform:uppercase;letter-spacing:.09em;font-size:11px;font-weight:800;color:var(--muted)}.big{font-size:44px;font-weight:800;letter-spacing:-.045em;line-height:1;margin:8px 0}.label{color:var(--muted)}.delta{font-weight:800;margin-top:10px}.good{color:var(--accent)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.today-row{display:flex;align-items:baseline;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.today-row strong{font-size:22px}
+.track{background:var(--accent-soft);border-color:#c6ddcf}.track.warn-card{background:var(--warn-soft);border-color:#ebd5aa}.track.bad-card{background:var(--bad-soft);border-color:#e9c6c6}.track-title{font-size:28px;font-weight:900;letter-spacing:.01em;margin:6px 0 8px}.track p{margin:0;color:#3d3b37}
+.progress{height:9px;background:#e7e1d8;border-radius:999px;overflow:hidden;margin-top:13px}.progress>div{height:100%;background:var(--accent);border-radius:999px}
+.section{margin-top:18px}.section-title{display:flex;justify-content:space-between;gap:15px;align-items:end;margin:0 0 10px}.section-title h2{font-size:19px;margin:0}.section-title p{margin:0;color:var(--muted);font-size:13px}
+.score{grid-template-columns:repeat(6,1fr)}.metric{min-height:118px}.metric .value{font-size:24px;font-weight:800;margin:9px 0 4px}.metric .tiny{font-size:12px;color:var(--muted)}
+.compare{margin-top:8px;font-size:12px;font-weight:700}.compare.good{color:var(--accent)}.compare.bad{color:var(--bad)}
+.insights{grid-template-columns:1.05fr 1.95fr}.execution{display:flex;align-items:center;gap:18px}.score-ring{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 0deg,#e8e2d9 0deg);flex:0 0 auto;position:relative}.score-ring:before{content:"";width:72px;height:72px;border-radius:50%;background:var(--panel);position:absolute}.score-ring strong{position:relative;font-size:25px}.breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.breakdown div{padding:9px;background:var(--panel2);border-radius:10px;text-align:center;font-size:12px}.breakdown strong{display:block;font-size:16px;margin-top:3px}
+.pattern-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.pattern{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}.pattern .pv{font-size:22px;font-weight:800;margin-top:6px}.pattern .ps{font-size:11px;color:var(--muted);margin-top:3px}
+.completeness{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.complete-item{background:var(--panel2);border-radius:12px;padding:11px;text-align:center}.complete-item strong{display:block;font-size:18px}.complete-item span{font-size:11px;color:var(--muted)}
+.fourweek{grid-template-columns:repeat(4,1fr)}.week-card .wk{font-size:12px;color:var(--muted)}.week-card .wv{font-size:24px;font-weight:800;margin:6px 0}.week-card .wd{font-size:12px;font-weight:700}
+.quick-entry input,.quick-entry select{font-size:17px;padding:12px}.quick-entry summary{cursor:pointer;list-style:none}.quick-entry summary::-webkit-details-marker{display:none}.summary-row{display:flex;justify-content:space-between;align-items:center;gap:12px}.summary-row:after{content:'Tap to open';font-size:12px;color:var(--muted)}.quick-entry[open] .summary-row:after{content:'Tap to collapse'}
+.projections{grid-template-columns:repeat(3,1fr)}.projection .pace{font-size:13px;color:var(--muted)}.projection .date{font-size:24px;font-weight:800;margin-top:5px}.projection.current{border:2px solid var(--accent)}
+.two{grid-template-columns:1.4fr .6fr}.chart-wrap{height:330px;position:relative}canvas{width:100%;height:100%;display:block}.legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:6px}.legend span:before{content:"";display:inline-block;width:18px;border-top:2px solid #76716a;margin-right:7px;vertical-align:middle}.legend span.avg:before{border-top:4px solid #1f6a4f}
+.targets{display:grid;gap:9px}.target{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.target:last-child{border-bottom:0}.status{font-weight:900}
+.forms{grid-template-columns:1fr 1fr}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:white;border-radius:10px;padding:10px 11px;color:var(--text);outline:none}.field textarea{min-height:74px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#aaa49b;box-shadow:0 0 0 3px rgba(70,65,57,.07)}.span2{grid-column:span 2}.form-actions{display:flex;gap:8px;margin-top:12px}
+.history{overflow:auto}.history table{width:100%;border-collapse:collapse;min-width:900px}.history th,.history td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap}.history th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.history td{font-size:13px}.linkbtn{border:0;background:none;padding:0;color:var(--bad);cursor:pointer}
+.empty{color:var(--muted);font-style:italic;padding:16px 0}.note{font-size:12px;color:var(--muted);margin-top:12px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;background:var(--panel2);border:1px solid var(--line)}
+@media(max-width:900px){.hero,.two,.forms,.insights{grid-template-columns:1fr}.score{grid-template-columns:repeat(2,1fr)}.projections{grid-template-columns:1fr}.metric{min-height:auto}.pattern-grid{grid-template-columns:repeat(2,1fr)}.completeness{grid-template-columns:repeat(3,1fr)}.fourweek{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.wrap{width:min(100% - 20px,1180px);padding-top:18px}header{align-items:flex-start;flex-direction:column}.score{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}.big{font-size:38px}.pattern-grid,.completeness,.fourweek,.breakdown{grid-template-columns:repeat(2,1fr)}.execution{align-items:flex-start}.score-ring{width:82px;height:82px}.score-ring:before{width:60px;height:60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>Weight Loss Dashboard</h1><div class="sub">Daily inputs. Weekly signal. Road to 205.</div></div>
+    <div class="actions"><button class="btn" id="exportBtn">Export CSV</button><button class="btn" id="exportJsonBtn">Backup JSON</button><label class="btn" style="cursor:pointer">Restore JSON<input id="importJson" type="file" accept="application/json" hidden></label></div>
+  </header>
+
+  <div class="grid hero">
+    <section class="card">
+      <div class="kicker">7-day average</div>
+      <div class="big" id="avg7">—</div>
+      <div class="label">Primary trend metric</div>
+      <div class="delta" id="weeklyDelta">Add weigh-ins to establish your trend.</div>
+      <div class="today-row"><span class="label">Today</span><strong id="todayWeight">—</strong></div>
+    </section>
+    <section class="card track" id="trackCard">
+      <div class="kicker">Am I on track?</div>
+      <div class="track-title" id="trackTitle">BUILDING TREND</div>
+      <p id="trackText">Enter daily weights and the dashboard will judge the trend—not the noise.</p>
+    </section>
+    <section class="card">
+      <div class="kicker">Goal progress</div>
+      <div class="big" id="goalWeight">205 <span style="font-size:18px">lb</span></div>
+      <div class="label" id="progressText">Goal weight</div>
+      <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+      <div class="note" id="progressPct">0% complete</div>
+    </section>
+  </div>
+
+  <section class="section">
+    <div class="section-title"><div><h2>This Week</h2><p>Monday-Sunday calendar week versus the prior Monday-Sunday week.</p></div><span class="pill" id="weekRange">This week</span></div>
+    <div class="grid score">
+      <div class="card metric"><div class="kicker">Weight</div><div class="value" id="weekWeight">—</div><div class="tiny">Week avg vs prior week</div><div class="compare" id="cmpWeight"></div></div>
+      <div class="card metric"><div class="kicker">Body fat</div><div class="value" id="weekBF">—</div><div class="tiny">Latest vs. prior scan</div><div class="compare" id="cmpBF"></div></div>
+      <div class="card metric"><div class="kicker">Avg calories</div><div class="value" id="weekCalories">—</div><div class="tiny">Monday to today</div><div class="compare" id="cmpCalories">—</div></div>
+      <div class="card metric"><div class="kicker">Avg protein</div><div class="value" id="weekProtein">—</div><div class="tiny">Monday to today</div><div class="compare" id="cmpProtein">—</div></div>
+      <div class="card metric"><div class="kicker">Avg steps</div><div class="value" id="weekSteps">—</div><div class="tiny">Monday to today</div><div class="compare" id="cmpSteps">—</div></div>
+      <div class="card metric"><div class="kicker">Workouts</div><div class="value" id="weekWorkouts">—</div><div class="tiny">Completed / weekly goal</div><div class="compare" id="cmpWorkouts">—</div></div>
+    </div>
+  </section>
+
+  <section class="section grid insights">
+    <div class="card">
+      <div class="section-title"><div><h2>Weekly Execution Score</h2><p>Calories, protein, steps, and workouts combined.</p></div></div>
+      <div class="execution"><div class="score-ring" id="scoreRing"><strong id="executionScore">—</strong></div><div><div class="track-title" style="font-size:22px" id="executionVerdict">Need more data</div><div class="label" id="executionText">Log the week to see how closely execution matched your targets.</div></div></div>
+      <div class="breakdown"><div>Calories<strong id="scoreCalories">—</strong></div><div>Protein<strong id="scoreProtein">—</strong></div><div>Steps<strong id="scoreSteps">—</strong></div><div>Workouts<strong id="scoreWorkouts">—</strong></div></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><div><h2>Data Completeness</h2><p>Know when the averages deserve confidence.</p></div><span class="pill" id="completeOverall">—</span></div>
+      <div class="completeness">
+        <div class="complete-item"><strong id="cWeight">—</strong><span>Weight</span></div><div class="complete-item"><strong id="cCalories">—</strong><span>Calories</span></div><div class="complete-item"><strong id="cProtein">—</strong><span>Protein</span></div><div class="complete-item"><strong id="cSteps">—</strong><span>Steps</span></div><div class="complete-item"><strong id="cSleep">—</strong><span>Sleep</span></div><div class="complete-item"><strong id="cHabits">—</strong><span>Workout / alcohol</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section card">
+    <details class="quick-entry" id="checkinDetails">
+      <summary><div class="summary-row"><div><h2 style="margin:0">Today's Check-In / Backfill</h2><p class="sub" style="margin:3px 0 0">Fast entry first. The dashboard does the analysis.</p></div><span class="pill" id="todaySavedPill">Not saved today</span></div></summary>
+      <form id="dailyForm" style="margin-top:18px">
+        <div class="form-grid">
+          <div class="field"><label>Date</label><input id="dDate" type="date" required></div>
+          <div class="field"><label>Morning weight (lb)</label><input id="dWeight" type="number" inputmode="decimal" step="0.1" min="80" max="500"></div>
+          <div class="field"><label>Calories</label><input id="dCalories" type="number" inputmode="numeric" step="1" min="0"></div>
+          <div class="field"><label>Protein (g)</label><input id="dProtein" type="number" inputmode="numeric" step="1" min="0"></div>
+          <div class="field"><label>Steps</label><input id="dSteps" type="number" inputmode="numeric" step="1" min="0"></div>
+          <div class="field"><label>Sleep (hours)</label><input id="dSleep" type="number" inputmode="decimal" step="0.1" min="0" max="24"></div>
+          <div class="field"><label>Workout</label><select id="dWorkout"><option value="">—</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+          <div class="field"><label>Alcohol</label><select id="dAlcohol"><option value="">—</option><option value="no">No</option><option value="yes">Yes</option></select></div>
+          <div class="field span2"><label>Notes</label><textarea id="dNotes" placeholder="Optional"></textarea></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" type="submit">Save / Update Entry</button><button class="btn" type="button" id="loadDateBtn">Load Selected Date</button></div>
+      </form>
+    </details>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><div><h2>Goal Projection</h2><p>A range, not a deadline.</p></div></div>
+    <div class="grid projections">
+      <div class="card projection"><div class="pace">Steady pace · 1.0 lb/week</div><div class="date" id="proj1">—</div><div class="note">Conservative planning case</div></div>
+      <div class="card projection"><div class="pace">Faster pace · 1.5 lb/week</div><div class="date" id="proj15">—</div><div class="note">Aggressive but useful planning case</div></div>
+      <div class="card projection current"><div class="pace">Current trend</div><div class="date" id="projCurrent">—</div><div class="note" id="projCurrentNote">Needs more data</div></div>
+    </div>
+  </section>
+
+  <section class="section grid two">
+    <div class="card">
+      <div class="section-title"><div><h2>Weight Trend</h2><p>Daily weight is noisy. The 7-day average is the signal.</p></div></div>
+      <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
+      <div class="legend"><span>Actual weight</span><span class="avg">7-day average</span></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><div><h2>Weekly Targets</h2><p>Simple signals, not daily judgment.</p></div></div>
+      <div class="targets">
+        <div class="target"><span>Protein target</span><span class="status" id="proteinTarget">—</span></div>
+        <div class="target"><span>Step target</span><span class="status" id="stepTarget">—</span></div>
+        <div class="target"><span>Workout target</span><span class="status" id="workoutTarget">—</span></div>
+        <div class="target"><span>Calorie average</span><span class="status" id="calorieTarget">—</span></div>
+      </div>
+      <div class="note">Targets use the current Monday-Sunday week. One off-day does not change the verdict.</div>
+    </div>
+  </section>
+
+  <section class="section grid insights">
+    <div class="card">
+      <div class="section-title"><div><h2>Recovery & Alcohol Pattern</h2><p>Recent behavior patterns, not causal claims.</p></div><span class="pill">Last 28 days</span></div>
+      <div class="pattern-grid">
+        <div class="pattern"><div class="kicker">Avg sleep</div><div class="pv" id="patternSleep">—</div><div class="ps" id="patternSleepN">No logged nights</div></div>
+        <div class="pattern"><div class="kicker">Alcohol days</div><div class="pv" id="patternAlcohol">—</div><div class="ps">Days marked Yes</div></div>
+        <div class="pattern"><div class="kicker">Calories day after alcohol</div><div class="pv" id="patternAfterAlcohol">—</div><div class="ps" id="patternAfterAlcoholN">Needs paired days</div></div>
+        <div class="pattern"><div class="kicker">Other logged days</div><div class="pv" id="patternOtherCalories">—</div><div class="ps" id="patternOtherCaloriesN">Comparison baseline</div></div>
+      </div>
+      <div class="note" id="alcoholInsight">This comparison simply surfaces a pattern in your own logs; it does not prove alcohol caused the difference.</div>
+    </div>
+    <div class="card">
+      <div class="section-title"><div><h2>4-Week Direction</h2><p>Weekly average weight makes the bigger trend easier to see.</p></div></div>
+      <div class="grid fourweek" id="fourWeekGrid"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="card">
+      <div class="section-title"><div><h2>Monday Body Composition</h2><p>Weekly is enough.</p></div></div>
+      <form id="bodyForm">
+        <div class="form-grid">
+          <div class="field"><label>Date</label><input id="bDate" type="date" required></div>
+          <div class="field"><label>Weight (lb)</label><input id="bWeight" type="number" step="0.1"></div>
+          <div class="field"><label>Scanned BMI</label><input id="bBMI" type="number" step="0.1"></div>
+          <div class="field"><label>Body fat %</label><input id="bFat" type="number" step="0.1"></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" type="submit">Save Monday Entry</button></div>
+      </form>
+      <div class="section-title" style="margin-top:24px"><div><h2>Goals & Targets</h2></div></div>
+      <form id="goalsForm">
+        <div class="form-grid">
+          <div class="field"><label>Starting weight</label><input id="gStart" type="number" step="0.1"></div>
+          <div class="field"><label>Goal weight</label><input id="gGoal" type="number" step="0.1"></div>
+          <div class="field"><label>Daily calories</label><input id="gCalories" type="number" step="1"></div>
+          <div class="field"><label>Protein (g)</label><input id="gProtein" type="number" step="1"></div>
+          <div class="field"><label>Steps</label><input id="gSteps" type="number" step="1"></div>
+          <div class="field"><label>Workout goal / week</label><input id="gWorkouts" type="number" step="1" min="0" max="14"></div>
+        </div>
+        <div class="form-actions"><button class="btn" type="submit">Save Goals</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="section card history">
+    <div class="section-title"><div><h2>History</h2><p>Your most recent entries.</p></div></div>
+    <div id="historyWrap"></div>
+  </section>
+  <div class="note" style="text-align:center;margin-top:18px">Data is stored only in this browser via localStorage. Use Backup JSON periodically if the data matters to you.</div>
+</div>
+<script>
+const KEY='weightDashboardSingleFileV5';
+const PREV_KEY='weightDashboardSingleFileV4';
+const defaultState={
+  goals:{startWeight:230,goalWeight:205,calories:2200,protein:200,steps:10000,workouts:4},
+  daily:[
+    {date:'2026-10-06',weight:218.6,calories:null,protein:null,steps:null,sleep:5.8,workout:'',alcohol:'',notes:''},
+    {date:'2026-10-05',weight:220,calories:1750,protein:150,steps:9500,sleep:8,workout:'no',alcohol:'yes',notes:''},
+    {date:'2026-10-04',weight:222,calories:4500,protein:150,steps:1500,sleep:7,workout:'no',alcohol:'no',notes:''},
+    {date:'2026-09-30',weight:218.6,calories:2000,protein:200,steps:5197,sleep:null,workout:'no',alcohol:'yes',notes:''},
+    {date:'2026-09-29',weight:220,calories:1550,protein:160,steps:11900,sleep:6.75,workout:'yes',alcohol:'yes',notes:''},
+    {date:'2026-09-28',weight:222,calories:1500,protein:150,steps:12888,sleep:7,workout:'yes',alcohol:'no',notes:''},
+    {date:'2026-09-25',weight:219.6,calories:2600,protein:190,steps:12000,sleep:6.5,workout:'yes',alcohol:'no',notes:''},
+    {date:'2026-09-24',weight:219.8,calories:1724,protein:168,steps:12476,sleep:6,workout:'yes',alcohol:'no',notes:''},
+    {date:'2026-09-23',weight:219.8,calories:1680,protein:151,steps:11224,sleep:7,workout:'yes',alcohol:'yes',notes:''},
+    {date:'2026-09-22',weight:219.6,calories:1950,protein:176,steps:11349,sleep:7.5,workout:'yes',alcohol:'no',notes:''},
+    {date:'2026-09-21',weight:221,calories:2138,protein:195,steps:10663,sleep:6.5,workout:'yes',alcohol:'no',notes:''}
+  ],
+  body:[
+    {date:'2026-10-05',weight:220,bmi:null,fat:22.2},
+    {date:'2026-09-28',weight:222,bmi:null,fat:23.1}
+  ]
+};
+let state=loadState();
+function loadState(){try{const raw=localStorage.getItem(KEY)||localStorage.getItem(PREV_KEY);if(!raw)return structuredClone(defaultState);const x=JSON.parse(raw);return {goals:{...defaultState.goals,...(x.goals||{})},daily:Array.isArray(x.daily)?x.daily:structuredClone(defaultState.daily),body:Array.isArray(x.body)?x.body:structuredClone(defaultState.body)}}catch(e){return structuredClone(defaultState)}}
+function saveState(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+const $=id=>document.getElementById(id); const num=v=>v===''||v==null?null:Number(v);
+function isoToday(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+function dateObj(s){return new Date(s+'T12:00:00')}
+function fmtDate(s){if(!s)return '—';return dateObj(s).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+function compactDate(d){return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+function avg(arr){const a=arr.filter(v=>Number.isFinite(v));return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
+function signed(v,unit='',digits=1){if(v==null||!Number.isFinite(v))return '—';const arrow=v<0?'↓':v>0?'↑':'→';return `${arrow} ${Math.abs(v).toFixed(digits)}${unit}`}
+function sortedDaily(){return [...state.daily].sort((a,b)=>a.date.localeCompare(b.date))}
+function weighted(){return sortedDaily().filter(x=>Number.isFinite(x.weight))}
+function rolling(data,window=7){return data.map((r,i)=>{const end=dateObj(r.date),start=new Date(end);start.setDate(start.getDate()-window+1);const vals=data.filter(x=>{const d=dateObj(x.date);return d>=start&&d<=end}).map(x=>x.weight).filter(Number.isFinite);return {...r,avg7:vals.length>=3?avg(vals):null}})}
+function anchorDate(){const all=sortedDaily();return all.length?dateObj(all.at(-1).date):dateObj(isoToday())}
+function periodDays(offsetStart,offsetEnd){const all=sortedDaily(),end=anchorDate();const hi=new Date(end),lo=new Date(end);hi.setDate(hi.getDate()-offsetStart);lo.setDate(lo.getDate()-offsetEnd);return all.filter(r=>{const d=dateObj(r.date);return d>=lo&&d<=hi})}
+function lastNDays(n){return periodDays(0,n-1)}
+function priorNDays(n){return periodDays(n,2*n-1)}
+function mondayOf(d){const x=new Date(d),day=x.getDay(),back=(day+6)%7;x.setDate(x.getDate()-back);return x}
+function sundayOf(d){const x=mondayOf(d);x.setDate(x.getDate()+6);return x}
+function weekBounds(offset=0){const anchor=anchorDate(),start=mondayOf(anchor);start.setDate(start.getDate()+offset*7);const end=new Date(start);end.setDate(end.getDate()+6);return {start,end}}
+function weekData(offset=0,throughAnchor=false){const {start,end}=weekBounds(offset),hi=throughAnchor&&offset===0?anchorDate():end;return sortedDaily().filter(r=>{const d=dateObj(r.date);return d>=start&&d<=hi})}
+function daysElapsedThisWeek(){const {start}=weekBounds(0);return Math.max(1,Math.min(7,Math.floor((anchorDate()-start)/86400000)+1))}
+function currentWeeklyDelta(){const cur=avg(lastNDays(7).map(x=>x.weight)),prior=avg(priorNDays(7).map(x=>x.weight));return cur==null||prior==null?null:cur-prior}
+function stablePacePerWeek(){const w=weighted();if(w.length<6)return null;const end=dateObj(w.at(-1).date),start=new Date(end);start.setDate(start.getDate()-27);const pts=w.filter(r=>dateObj(r.date)>=start);if(pts.length<6)return null;const x=pts.map(r=>(dateObj(r.date)-dateObj(pts[0].date))/86400000),y=pts.map(r=>r.weight);if(Math.max(...x)<7)return null;const xm=avg(x),ym=avg(y);let n=0,dn=0;for(let i=0;i<x.length;i++){n+=(x[i]-xm)*(y[i]-ym);dn+=(x[i]-xm)**2}return dn?-(n/dn)*7:null}
+function pacePerWeek(){return stablePacePerWeek()}
+function projectDate(weight,goal,pace){if(!Number.isFinite(weight)||!Number.isFinite(goal)||!Number.isFinite(pace)||pace<=0)return null;const weeks=Math.max(0,(weight-goal)/pace);const d=new Date();d.setDate(d.getDate()+Math.round(weeks*7));return d}
+function bodyDelta(field){const b=[...state.body].filter(x=>Number.isFinite(x[field])).sort((a,c)=>a.date.localeCompare(c.date));return b.length>=2?b[b.length-1][field]-b[b.length-2][field]:null}
+function updateForms(){const g=state.goals;$('gStart').value=g.startWeight??'';$('gGoal').value=g.goalWeight??'';$('gCalories').value=g.calories??'';$('gProtein').value=g.protein??'';$('gSteps').value=g.steps??'';$('gWorkouts').value=g.workouts??''}
+function renderAll(){updateForms();renderHero();renderWeek();renderExecution();renderCompleteness();renderProjection();renderTargets();renderPatterns();renderFourWeeks();renderTodayState();renderHistory();drawChart()}
+function renderHero(){const w=weighted(),r=rolling(w), latest=w.at(-1), avg7=r.at(-1)?.avg7??null, delta=currentWeeklyDelta(),pace=pacePerWeek(),g=state.goals;
+ $('avg7').textContent=avg7==null?'—':avg7.toFixed(1)+' lb';$('todayWeight').textContent=latest?latest.weight.toFixed(1)+' lb':'—';
+ const wd=$('weeklyDelta');if(delta==null){wd.textContent='Need weigh-ins in both 7-day windows to compare trends.';wd.className='delta'}else{wd.textContent=`${signed(delta,' lb')} vs prior 7 days`;wd.className='delta '+(delta<0?'good':delta>0?'bad':'')}
+ $('goalWeight').innerHTML=`${g.goalWeight??205} <span style="font-size:18px">lb</span>`;
+ if(latest&&Number.isFinite(g.startWeight)&&Number.isFinite(g.goalWeight)&&g.startWeight!==g.goalWeight){const pct=Math.max(0,Math.min(100,(g.startWeight-latest.weight)/(g.startWeight-g.goalWeight)*100));$('progressBar').style.width=pct+'%';$('progressPct').textContent=pct.toFixed(0)+'% complete';$('progressText').textContent=`${Math.max(0,latest.weight-g.goalWeight).toFixed(1)} lb to go`}else{$('progressBar').style.width='0%';$('progressPct').textContent='0% complete';$('progressText').textContent='Goal weight'}
+ const card=$('trackCard');card.className='card track';if(pace==null){$('trackTitle').textContent='BUILDING TREND';$('trackText').textContent='Enter daily weights and the dashboard will judge the trend—not the noise.';return}
+ const p=pace.toFixed(1),pd=projectDate(avg7??latest?.weight,g.goalWeight,pace);
+ if(pace>=0.75&&pace<=2){$('trackTitle').textContent='ON TRACK';$('trackText').innerHTML=`You're averaging <strong>${p} lb/week</strong> of weight loss.${pd?` At this pace, 205 lb is projected around <strong>${compactDate(pd)}</strong>.`:''}`}
+ else if(pace>0&&pace<0.75){card.classList.add('warn-card');$('trackTitle').textContent='SLIGHTLY BEHIND';$('trackText').innerHTML=`You're averaging <strong>${p} lb/week</strong> of weight loss. The trend is moving in the right direction, just more slowly.`}
+ else if(pace>2){card.classList.add('warn-card');$('trackTitle').textContent='AHEAD — WATCH THE PACE';$('trackText').innerHTML=`The recent trend is <strong>${p} lb/week</strong>. That's fast enough that a short data window may be exaggerating the projection.`}
+ else{card.classList.add('bad-card');$('trackTitle').textContent='TRENDING OFF TRACK';$('trackText').innerHTML=`Your recent trend isn't showing weight loss yet. Use the weekly averages to decide whether calories, activity, or consistency need adjusting.`}
+}
+function compareText(cur,prior,unit='',lowerBetter=false){if(cur==null||prior==null)return {text:'Prior week: —',cls:''};const diff=cur-prior,better=lowerBetter?diff<0:diff>0,worse=lowerBetter?diff>0:diff<0;return {text:`${diff===0?'→':diff>0?'↑':'↓'} ${Math.abs(diff).toFixed(unit===' lb'?1:0)}${unit} vs prior week`,cls:better?'good':worse?'bad':''}}
+function renderWeek(){const d=weekData(0,true),prior=weekData(-1,false),{start,end}=weekBounds(0),elapsed=daysElapsedThisWeek();$('weekRange').textContent=`${start.toLocaleDateString(undefined,{month:'short',day:'numeric'})} – ${end.toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${elapsed} of 7 days`;
+ const cw=avg(d.map(x=>x.weight)),pw=avg(prior.map(x=>x.weight)),delta=cw==null||pw==null?null:cw-pw;$('weekWeight').textContent=delta==null?'—':signed(delta,' lb');$('weekWeight').className='value '+(delta<0?'good':delta>0?'bad':'');$('cmpWeight').textContent=cw==null?'Current avg: —':`Current avg ${cw.toFixed(1)} lb`;
+ const curBF=state.body.filter(x=>Number.isFinite(x.fat)&&dateObj(x.date)>=start&&dateObj(x.date)<=anchorDate()).sort((a,b)=>a.date.localeCompare(b.date)).at(-1),pb=weekBounds(-1),priorBF=state.body.filter(x=>Number.isFinite(x.fat)&&dateObj(x.date)>=pb.start&&dateObj(x.date)<=pb.end).sort((a,b)=>a.date.localeCompare(b.date)).at(-1),bf=curBF&&priorBF?curBF.fat-priorBF.fat:null;$('weekBF').textContent=bf==null?'—':signed(bf,'%',1);$('weekBF').className='value '+(bf<0?'good':bf>0?'bad':'');$('cmpBF').textContent=bf==null?'Need scans in both weeks':`${curBF.fat.toFixed(1)}% vs ${priorBF.fat.toFixed(1)}% last week`;$('cmpBF').className='compare '+(bf<0?'good':bf>0?'bad':'');
+ const fields=[['Calories','calories','',true],['Protein','protein','g',false],['Steps','steps','',false]];for(const [name,key,unit,lower] of fields){const cur=avg(d.map(x=>x[key])),pr=avg(prior.map(x=>x[key]));$('week'+name).textContent=cur==null?'—':Math.round(cur).toLocaleString()+unit;const cmp=compareText(cur,pr,unit,lower),el=$('cmp'+name);el.textContent=cmp.text;el.className='compare '+cmp.cls}
+ const wo=d.filter(x=>x.workout==='yes').length,pwo=prior.filter(x=>x.workout==='yes').length;$('weekWorkouts').textContent=`${wo}/${state.goals.workouts??4}`;$('cmpWorkouts').textContent=prior.length?`${wo-pwo===0?'→':wo>pwo?'↑':'↓'} ${Math.abs(wo-pwo)} vs prior week`:'Prior week: —';$('cmpWorkouts').className='compare '+(wo>pwo?'good':wo<pwo?'bad':'');
+}
+function metricScore(actual,target,type){if(!Number.isFinite(actual)||!Number.isFinite(target)||target<=0)return null;if(type==='calories')return Math.max(0,Math.min(100,100-Math.abs(actual-target)/target*250));return Math.max(0,Math.min(100,actual/target*100))}
+function renderExecution(){const d=weekData(0,true),g=state.goals,c=avg(d.map(x=>x.calories)),p=avg(d.map(x=>x.protein)),st=avg(d.map(x=>x.steps)),wo=d.filter(x=>x.workout==='yes').length,workoutPace=(g.workouts??4)*daysElapsedThisWeek()/7;const vals=[metricScore(c,g.calories,'calories'),metricScore(p,g.protein),metricScore(st,g.steps),metricScore(wo,workoutPace)].filter(Number.isFinite);const score=vals.length>=3?avg(vals):null;const mapping=[['scoreCalories',metricScore(c,g.calories,'calories')],['scoreProtein',metricScore(p,g.protein)],['scoreSteps',metricScore(st,g.steps)],['scoreWorkouts',metricScore(wo,workoutPace)]];for(const [id,v] of mapping)$(id).textContent=v==null?'—':Math.round(v)+'%';if(score==null){$('executionScore').textContent='—';$('scoreRing').style.background='conic-gradient(#e8e2d9 0deg,#e8e2d9 360deg)';$('executionVerdict').textContent='Need more data';$('executionText').textContent='Log at least three target categories this week to calculate a score.';return}const sc=Math.round(score);$('executionScore').textContent=sc;$('scoreRing').style.background=`conic-gradient(var(--accent) ${score*3.6}deg,#e8e2d9 0deg)`;let verdict,text;if(sc>=90){verdict='Excellent execution';text='Your behaviors matched the plan closely. Let the weight trend catch up.'}else if(sc>=80){verdict='Strong week';text='Most targets were on plan. Focus on the weakest category instead of overcorrecting.'}else if(sc>=65){verdict='Mixed execution';text='There is enough drift to explain a slower trend. Tighten one or two controllable inputs.'}else{verdict='Off-plan week';text='Execution was meaningfully below target. Fix consistency before changing the plan.'}$('executionVerdict').textContent=verdict;$('executionText').textContent=text}
+function renderCompleteness(){const d=weekData(0,true),expected=daysElapsedThisWeek(),count=k=>d.filter(r=>r[k]!==null&&r[k]!==''&&r[k]!==undefined).length;const vals={cWeight:count('weight'),cCalories:count('calories'),cProtein:count('protein'),cSteps:count('steps'),cSleep:count('sleep')};for(const [id,n] of Object.entries(vals))$(id).textContent=`${n}/${expected}`;const habits=d.filter(r=>r.workout&&r.alcohol).length;$('cHabits').textContent=`${habits}/${expected}`;const overall=Math.round((Object.values(vals).reduce((a,b)=>a+b,0)+habits)/(6*expected)*100);$('completeOverall').textContent=`${overall}% complete`}
+function renderProjection(){const w=weighted(),r=rolling(w),current=r.at(-1)?.avg7??w.at(-1)?.weight??null,g=state.goals.goalWeight;const p=pacePerWeek();for(const [id,pace] of [['proj1',1],['proj15',1.5]]){const d=projectDate(current,g,pace);$(id).textContent=d?compactDate(d):'—'}const cp=projectDate(current,g,p);$('projCurrent').textContent=cp?compactDate(cp):'—';$('projCurrentNote').textContent=p&&p>0?`${p.toFixed(2)} lb/week · up to 28-day regression`:'Needs more trend data'}
+function targetText(actual,target,unit,type){if(actual==null)return '—';let ok= type==='calories'?actual<=target*1.05:actual>=target;let close= type==='calories'?actual<=target*1.12:actual>=target*.9;return `${Math.round(actual).toLocaleString()} / ${Math.round(target).toLocaleString()}${unit} ${ok?'✓':close?'●':'!'}`}
+function renderTargets(){const d=weekData(0,true),g=state.goals,p=avg(d.map(x=>x.protein)),s=avg(d.map(x=>x.steps)),c=avg(d.map(x=>x.calories)),wo=d.filter(x=>x.workout==='yes').length;
+ const els=[[$('proteinTarget'),p,g.protein,'g','normal'],[$('stepTarget'),s,g.steps,'','normal'],[$('calorieTarget'),c,g.calories,'','calories']];els.forEach(([e,a,t,u,typ])=>{e.textContent=targetText(a,t,u,typ);e.className='status '+(a==null?'':((typ==='calories'?a<=t*1.05:a>=t)?'good':((typ==='calories'?a<=t*1.12:a>=t*.9)?'warn':'bad')))});$('workoutTarget').textContent=`${wo} / ${g.workouts??4} ${wo>=(g.workouts??4)?'✓':wo>=Math.max(1,(g.workouts??4)-1)?'●':'!'}`;$('workoutTarget').className='status '+(wo>=(g.workouts??4)?'good':wo>=Math.max(1,(g.workouts??4)-1)?'warn':'bad')}
+function recent28(){const all=sortedDaily();if(!all.length)return[];const end=anchorDate(),start=new Date(end);start.setDate(start.getDate()-27);return all.filter(r=>dateObj(r.date)>=start&&dateObj(r.date)<=end)}
+function renderPatterns(){const d=recent28(),sl=d.filter(r=>Number.isFinite(r.sleep)),alc=d.filter(r=>r.alcohol==='yes');const sleep=avg(sl.map(r=>r.sleep));$('patternSleep').textContent=sleep==null?'—':sleep.toFixed(1)+' hr';$('patternSleepN').textContent=`${sl.length} logged night${sl.length===1?'':'s'}`;$('patternAlcohol').textContent=alc.length.toString();const byDate=new Map(d.map(r=>[r.date,r]));const after=[],other=[];for(const r of d){if(!Number.isFinite(r.calories))continue;const prev=new Date(dateObj(r.date));prev.setDate(prev.getDate()-1);const ps=prev.toISOString().slice(0,10),wasAfter=byDate.get(ps)?.alcohol==='yes';(wasAfter?after:other).push(r.calories)}const aa=avg(after),oo=avg(other);$('patternAfterAlcohol').textContent=aa==null?'—':Math.round(aa).toLocaleString();$('patternAfterAlcoholN').textContent=`${after.length} paired day${after.length===1?'':'s'}`;$('patternOtherCalories').textContent=oo==null?'—':Math.round(oo).toLocaleString();$('patternOtherCaloriesN').textContent=`${other.length} other logged day${other.length===1?'':'s'}`;if(aa!=null&&oo!=null){const diff=aa-oo;$('alcoholInsight').innerHTML=`On logged days following alcohol, calories averaged <strong>${Math.round(aa).toLocaleString()}</strong>, ${diff>=0?'<strong>'+Math.round(diff).toLocaleString()+' higher</strong>':'<strong>'+Math.abs(Math.round(diff)).toLocaleString()+' lower</strong>'} than other logged days. Small samples can be noisy; treat this as a pattern to watch, not proof of causation.`}}
+function renderFourWeeks(){const cards=[];for(let i=3;i>=0;i--){const {start:lo,end:hi}=weekBounds(-i),vals=weighted().filter(r=>{const d=dateObj(r.date);return d>=lo&&d<=hi}).map(r=>r.weight),a=avg(vals);cards.push({lo,hi,a,n:vals.length})}let h='';cards.forEach((w,i)=>{const prev=i?cards[i-1].a:null,d=w.a!=null&&prev!=null?w.a-prev:null;h+=`<div class="card week-card"><div class="wk">${w.lo.toLocaleDateString(undefined,{month:'short',day:'numeric'})} – ${w.hi.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div><div class="wv">${w.a==null?'—':w.a.toFixed(1)+' lb'}</div><div class="wd ${d<0?'good':d>0?'bad':''}">${d==null?`${w.n} weigh-in${w.n===1?'':'s'}`:`${signed(d,' lb')} vs prior week`}</div></div>`});$('fourWeekGrid').innerHTML=h}
+function renderTodayState(){const today=isoToday(),r=state.daily.find(x=>x.date===today),pill=$('todaySavedPill'),details=$('checkinDetails');if(r){pill.textContent='Saved today ✓';pill.className='pill good';if(!details.dataset.userToggled)details.open=false}else{pill.textContent='Not saved today';pill.className='pill';if(!details.dataset.userToggled)details.open=true}}
+function renderHistory(){const d=[...state.daily].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,30);if(!d.length){$('historyWrap').innerHTML='<div class="empty">No daily entries yet.</div>';return}const rollingMap=new Map(rolling(weighted()).map(x=>[x.date,x.avg7]));let h='<table><thead><tr><th>Date</th><th>Weight</th><th>7d Avg</th><th>Calories</th><th>Protein</th><th>Steps</th><th>Sleep</th><th>Workout</th><th>Alcohol</th><th></th></tr></thead><tbody>';for(const r of d){h+=`<tr><td>${fmtDate(r.date)}</td><td>${r.weight??'—'}</td><td>${rollingMap.get(r.date)?.toFixed(1)??'—'}</td><td>${r.calories??'—'}</td><td>${r.protein??'—'}</td><td>${r.steps?.toLocaleString?.()??'—'}</td><td>${r.sleep??'—'}</td><td>${r.workout==='yes'?'Yes':r.workout==='no'?'No':'—'}</td><td>${r.alcohol==='yes'?'Yes':r.alcohol==='no'?'No':'—'}</td><td><button class="linkbtn" onclick="deleteDaily('${r.date}')">Delete</button></td></tr>`}h+='</tbody></table>';$('historyWrap').innerHTML=h}
+function deleteDaily(date){if(confirm(`Delete entry for ${date}?`)){state.daily=state.daily.filter(x=>x.date!==date);saveState()}}
+function drawChart(){const canvas=$('weightChart'),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=Math.max(300,rect.width*dpr);canvas.height=Math.max(220,rect.height*dpr);const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const W=rect.width,H=rect.height,pad={l:46,r:15,t:16,b:34};ctx.clearRect(0,0,W,H);const data=rolling(weighted()).slice(-60);if(data.length<2){ctx.fillStyle='#716d65';ctx.font='14px system-ui';ctx.fillText('Add at least two weigh-ins to draw the trend.',20,40);return}const vals=[...data.map(x=>x.weight),...data.map(x=>x.avg7).filter(Number.isFinite)],min=Math.floor(Math.min(...vals)-1),max=Math.ceil(Math.max(...vals)+1),x=i=>pad.l+i*(W-pad.l-pad.r)/(data.length-1),y=v=>pad.t+(max-v)*(H-pad.t-pad.b)/(max-min||1);ctx.strokeStyle='#ded8ce';ctx.fillStyle='#716d65';ctx.font='11px system-ui';ctx.lineWidth=1;for(let i=0;i<=4;i++){const v=min+(max-min)*i/4,yy=y(v);ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();ctx.fillText(v.toFixed(0),6,yy+4)}
+ ctx.strokeStyle='#817c74';ctx.lineWidth=1.5;ctx.beginPath();data.forEach((r,i)=>i?ctx.lineTo(x(i),y(r.weight)):ctx.moveTo(x(i),y(r.weight)));ctx.stroke();ctx.fillStyle='#817c74';for(let i=0;i<data.length;i++){ctx.beginPath();ctx.arc(x(i),y(data[i].weight),2,0,Math.PI*2);ctx.fill()}
+ const av=data.map((r,i)=>[i,r.avg7]).filter(a=>Number.isFinite(a[1]));if(av.length){ctx.strokeStyle='#1f6a4f';ctx.lineWidth=4;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();av.forEach(([i,v],j)=>j?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v)));ctx.stroke()}
+ const ticks=[0,Math.floor((data.length-1)/2),data.length-1];ctx.fillStyle='#716d65';ctx.textAlign='center';ticks.forEach(i=>ctx.fillText(dateObj(data[i].date).toLocaleDateString(undefined,{month:'short',day:'numeric'}),x(i),H-10));ctx.textAlign='start'}
+$('dailyForm').addEventListener('submit',e=>{e.preventDefault();const r={date:$('dDate').value,weight:num($('dWeight').value),calories:num($('dCalories').value),protein:num($('dProtein').value),steps:num($('dSteps').value),sleep:num($('dSleep').value),workout:$('dWorkout').value,alcohol:$('dAlcohol').value,notes:$('dNotes').value.trim()};if(!r.date)return;const i=state.daily.findIndex(x=>x.date===r.date);if(i>=0)state.daily[i]=r;else state.daily.push(r);saveState();e.target.reset();$('dDate').value=isoToday();$('checkinDetails').open=false});
+$('loadDateBtn').addEventListener('click',()=>{const r=state.daily.find(x=>x.date===$('dDate').value);if(!r)return alert('No saved entry for that date.');for(const [id,k] of [['dWeight','weight'],['dCalories','calories'],['dProtein','protein'],['dSteps','steps'],['dSleep','sleep'],['dWorkout','workout'],['dAlcohol','alcohol'],['dNotes','notes']])$(id).value=r[k]??''});
+$('bodyForm').addEventListener('submit',e=>{e.preventDefault();const r={date:$('bDate').value,weight:num($('bWeight').value),bmi:num($('bBMI').value),fat:num($('bFat').value)};if(!r.date)return;const i=state.body.findIndex(x=>x.date===r.date);if(i>=0)state.body[i]=r;else state.body.push(r);saveState();e.target.reset();$('bDate').value=isoToday()});
+$('goalsForm').addEventListener('submit',e=>{e.preventDefault();state.goals={startWeight:num($('gStart').value),goalWeight:num($('gGoal').value),calories:num($('gCalories').value),protein:num($('gProtein').value),steps:num($('gSteps').value),workouts:num($('gWorkouts').value)};saveState()});
+$('exportBtn').addEventListener('click',()=>{const cols=['date','weight','calories','protein','steps','sleep','workout','alcohol','notes'];const rows=[cols.join(','),...sortedDaily().map(r=>cols.map(k=>'"'+String(r[k]??'').replaceAll('"','""')+'"').join(','))];download('weight-dashboard.csv',rows.join('\n'),'text/csv')});
+$('exportJsonBtn').addEventListener('click',()=>download('weight-dashboard-backup.json',JSON.stringify(state,null,2),'application/json'));
+$('importJson').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.goals||!Array.isArray(x.daily)||!Array.isArray(x.body))throw new Error();if(confirm('Replace current browser data with this backup?')){state=x;saveState()}}catch(err){alert('That file does not look like a valid dashboard backup.')}e.target.value=''});
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+window.addEventListener('resize',drawChart);$('checkinDetails').addEventListener('toggle',()=>{$('checkinDetails').dataset.userToggled='1'});$('dDate').value=isoToday();$('bDate').value=isoToday();renderAll();
+</script>
+</body>
+</html>
